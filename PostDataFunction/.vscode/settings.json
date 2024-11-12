@@ -1,6 +1,6 @@
 {
     "azureFunctions.javaBuildTool": "maven",
-    "azureFunctions.deploySubpath": "target/azure-functions/PostDataFunction-1731436178803",
+    "azureFunctions.deploySubpath": "target/azure-functions/PostDataFunction-1731436580664",
     "azureFunctions.projectLanguage": "Java",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",

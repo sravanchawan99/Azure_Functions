@@ -8,7 +8,7 @@
 			"problemMatcher": "$func-java-watch",
 			"isBackground": true,
 			"options": {
-				"cwd": "${workspaceFolder}/target/azure-functions/PostDataFunction-1731436178803"
+				"cwd": "${workspaceFolder}/target/azure-functions/PostDataFunction-1731436580664"
 			},
 			"dependsOn": "package (functions)"
 		},
