@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Function {
     @FunctionName("InsertStudentData")
-    public HttpResponseMessage run(
+    public HttpResponseMessage runPostOperation(
         @HttpTrigger(
             name = "req",
             methods = {HttpMethod.POST},
@@ -98,6 +98,62 @@ public class Function {
             return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Database connection failed: " + e.getMessage())
                 .build();
+        }
+    }
+    @FunctionName("GetStudentById")
+    public HttpResponseMessage runGetOperation(
+        @HttpTrigger(name = "req", methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.FUNCTION)
+        HttpRequestMessage<Optional<String>> request,
+        final ExecutionContext context) {
+        
+        context.getLogger().info("Java HTTP trigger processed a request to fetch student by ID.");
+
+        // Parse query parameter
+        String id = request.getQueryParameters().get("id");
+        if (id == null) {
+            return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
+                .body("Please pass an id on the query string").build();
+        }
+
+        // Database connection details
+        String url = "jdbc:mysql://sql-sravan-01.mysql.database.azure.com:3306/azure_demos?useSSL=true";
+        String user = "Sravan";
+        String password = "Sravan@7";
+
+        // Initialize the result map to hold student data
+        Map<String, Object> result = new HashMap<>();
+
+        // Connect to the database and execute query
+        try (
+            Connection connection = DriverManager.getConnection(url, user, password);
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM students WHERE id = ?")
+        ) {
+            statement.setInt(1, Integer.parseInt(id));
+            ResultSet resultSet = statement.executeQuery();
+
+            // Process the result set
+            if (resultSet.next()) {
+                result.put("id", resultSet.getInt("id"));
+                result.put("first_name", resultSet.getString("first_name"));
+                result.put("last_name", resultSet.getString("last_name"));
+                result.put("dob", resultSet.getDate("dob").toString());
+                result.put("gender", resultSet.getString("gender"));
+            } else {
+                return request.createResponseBuilder(HttpStatus.NOT_FOUND)
+                    .body("Student not found with ID: " + id).build();
+            }
+
+            // Return result as JSON
+            return request.createResponseBuilder(HttpStatus.OK).body(result).build();
+
+        } catch (SQLException e) {
+            context.getLogger().severe("Database connection error: " + e.getMessage());
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error connecting to the database").build();
+        } catch (NumberFormatException e) {
+            context.getLogger().severe("Invalid ID format: " + e.getMessage());
+            return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
+                .body("ID must be a valid integer").build();
         }
     }
 }
