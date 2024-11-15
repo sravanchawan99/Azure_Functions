@@ -121,7 +121,7 @@ public class Function {
         String password = "Sravan@7";
 
         // Initialize the result map to hold student data
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
 
         // Connect to the database and execute query
         try (
